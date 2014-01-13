@@ -1,19 +1,86 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Window
 	x:Class="Convertidor.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	Title="Convertidor"
-	Height="300"
-	Width="300">
+	Title="Convertidor" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	mc:Ignorable="d"
+	Height="439"
+	Width="500">
+	<Window.Background>
+		<LinearGradientBrush
+			StartPoint="0.5,0"
+			EndPoint="0.5,1">
+			<LinearGradientBrush.GradientStops>
+				<GradientStop
+					Color="#FFA6CAF0"
+					Offset="0" />
+				<GradientStop
+					Color="#FFFFFFFF"
+					Offset="1" />
+			</LinearGradientBrush.GradientStops>
+		</LinearGradientBrush>
+	</Window.Background>
 	<Grid>
 		<Grid.RowDefinitions>
-			<RowDefinition />
-			<RowDefinition />
-			<RowDefinition />
-			<RowDefinition />
-			<RowDefinition />
+			<RowDefinition
+				Height="Auto" />
+			<RowDefinition
+				Height="*" />
+			<RowDefinition
+				Height="*" />
+			<RowDefinition
+				Height="*" />
+			<RowDefinition
+				Height="*" />
 		</Grid.RowDefinitions>
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition />
-		</Grid.ColumnDefinitions>
+		<Grid.ColumnDefinitions></Grid.ColumnDefinitions>
+		<Label
+			Grid.Column="0"
+			Grid.Row="0"
+			HorizontalAlignment="Right"
+			Height="24"
+			VerticalAlignment="Bottom"
+			Margin="0,0,8,0"
+			Content="© Luciano Delucchi" />
+		<Border
+			Typography.CapitalSpacing="False"
+			BorderThickness="1,1,1,1"
+			BorderBrush="#FF000000"
+			RenderTransformOrigin="0.5,0.5"
+			Grid.Column="0"
+			Grid.Row="1"
+			HorizontalAlignment="Stretch"
+			VerticalAlignment="Stretch"
+			Margin="8,8,8,8">
+			<TextBlock
+				Text="Drag the folder with the photos over this area"
+				TextAlignment="Left"
+				Width="229"
+				HorizontalAlignment="Center"
+				VerticalAlignment="Center"
+				Height="18" />
+		</Border>
+		<ListBox
+			HorizontalContentAlignment="Stretch"
+			Grid.Column="0"
+			HorizontalAlignment="Stretch"
+			Margin="8,0,8,0"
+			BorderThickness="1,1,1,1"
+			Grid.Row="2"
+			VerticalAlignment="Stretch"></ListBox>
+		<ProgressBar
+			Grid.Column="0"
+			Grid.Row="3"
+			HorizontalAlignment="Stretch"
+			VerticalAlignment="Center"
+			Margin="8,0,8,0"
+			Height="40" />
+		<Button
+			Grid.Column="0"
+			Grid.Row="4"
+			HorizontalAlignment="Center"
+			VerticalAlignment="Center"
+			Width="75"
+			Height="49"
+			Content="Compress" />
 	</Grid>
 </Window>
