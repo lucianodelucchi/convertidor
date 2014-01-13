@@ -66,13 +66,13 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\WPFAssemblyInfo.cs" />
-    <Compile Include="Main Window.xaml.cs">
+    <Compile Include="MainWindow.xaml.cs">
       <SubType>Code</SubType>
-      <DependentUpon>Main Window.xaml</DependentUpon>
+      <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Main Window.xaml" />
+    <Page Include="MainWindow.xaml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
