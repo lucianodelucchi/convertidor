@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Text;
+
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-
-using System.Drawing.Imaging;
-using System.Drawing;
 
 namespace Convertidor
 {
@@ -54,28 +55,34 @@ namespace Convertidor
 		{
 			string[] strArray = (string[]) e.Data.GetData(DataFormats.FileDrop, false);
 	      	
-//			this.lstFiles.Items.Clear();
-//	      	this.directory = strArray[0];
-//	      	foreach (FileSystemInfo fileSystemInfo in new DirectoryInfo(strArray[0]).GetFiles("*.jpg"))
-//	        	this.lstFiles.Items.Add((object) fileSystemInfo.Name);
-//	      	this.pbStatus.Maximum = this.lstFiles.Items.Count;
-//	      	this.btnCompress.Enabled = this.lstFiles.Items.Count > 0;
+			this.ImagesListBox.Items.Clear();
+	      	this.directory = strArray[0];
+	      	foreach (FileSystemInfo fileSystemInfo in new DirectoryInfo(strArray[0]).GetFiles("*.jpg"))
+	        	this.ImagesListBox.Items.Add((object) fileSystemInfo.Name);
+	      	this.ConvertidorProgress.Maximum = this.ImagesListBox.Items.Count;
+	      	this.CompressButton.IsEnabled = this.ImagesListBox.Items.Count > 0;
 		}
 		
 		void Compress_Click(object sender, RoutedEventArgs e)
 		{
-//			string str = Path.Combine(this.directory, "comprimidas");
-//			DirectoryInfo directory = Directory.CreateDirectory(str);
-//			this.Cursor = Cursors.WaitCursor;
-//			foreach (string path2 in this.lstFiles.Items)
-//			{
-//				string NewFile = Path.Combine(directory.FullName, path2);
-//				this.ResizeImage(Path.Combine(this.directory, path2), NewFile, 800, 600, true);
-//				this.pbStatus.PerformStep();
-//				Application.DoEvents();
-//			}
-//			this.pbStatus.Value = 0;
-//			this.Cursor = Cursors.Default;
+			string str = Path.Combine(this.directory, "compressed");
+			DirectoryInfo directory = Directory.CreateDirectory(str);
+			
+			var cursor = this.Cursor;
+			this.Cursor = Cursors.Wait;
+			
+			var progress = 1;
+			
+			foreach (string path in this.ImagesListBox.Items)
+			{
+				string newFile = Path.Combine(directory.FullName, path);
+				this.ResizeImage(Path.Combine(this.directory, path), newFile, 800, 600, true);
+
+				UiInvoke(() => this.ConvertidorProgress.Value = progress++);
+			}
+			MessageBox.Show(this, "Conversion Completed", "Process Completed", MessageBoxButton.OK, MessageBoxImage.Information);
+			this.ConvertidorProgress.Value = 0;
+			this.Cursor = cursor;
 			
 		}
 		
@@ -112,6 +119,10 @@ namespace Convertidor
 			this.NewImage.Save(NewFile, jpegCodecInfo, myEncoderParameters);
 		}
 		
+		public static void UiInvoke(Action a)
+		{
+			Application.Current.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Background, a);
+		}
 
 	}
 }

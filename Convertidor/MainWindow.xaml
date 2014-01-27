@@ -65,14 +65,16 @@
 			Margin="10,10,10,10"></ListBox>
 		<ProgressBar
 			Height="40"
-			Margin="10,10,10,10" />
+			Margin="10,10,10,10"
+			x:Name="ConvertidorProgress"/>
 		<Button
 			Width="75"
 			Height="49"
 			Content="Compress"
 			x:Name="CompressButton"
 			Click="Compress_Click"
-			Margin="10,10,10,10" />
+			Margin="10,10,10,10"
+			IsEnabled="False" />
 		<Label
 			Content="Luciano Delucchi"
 			FontSize="9"
