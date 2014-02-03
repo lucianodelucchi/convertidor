@@ -15,4 +15,7 @@ Global
 		{D072A526-25DA-40B8-84D0-38370FEEFA0C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D072A526-25DA-40B8-84D0-38370FEEFA0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		EnterpriseLibraryConfigurationToolBinariesPath = packages\Unity.2.1.505.2\lib\NET35
+	EndGlobalSection
 EndGlobal
