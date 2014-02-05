@@ -5,18 +5,18 @@ namespace Convertidor.Models
 	/// <summary>
 	/// Description of Image.
 	/// </summary>
-	public class Image
+	public class OwnImage
 	{
         #region Creation
 
-        public static Image CreateNewImage()
+        public static OwnImage CreateNewOwnImage()
         {
-            return new Image();
+            return new OwnImage();
         }
 
-        public static Image CreateImage(string filename, string path, string saveAs)
+        public static OwnImage CreateOwnImage(string filename, string path, string saveAs)
         {
-            return new Image
+            return new OwnImage
             {
                 Path = path,
                 SaveAs = saveAs,
@@ -24,7 +24,7 @@ namespace Convertidor.Models
             };
         }
 
-        protected Image()
+        protected OwnImage()
         {
         }
 

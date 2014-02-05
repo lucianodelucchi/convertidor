@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+
+using Convertidor.Models;
 
 namespace Convertidor.Services
 {
@@ -48,13 +53,44 @@ namespace Convertidor.Services
 			return null;
 		}
 		
-		public void ConvertImages(IEnumerable<Convertidor.Models.Image> images)
+		public void ConvertImages(IEnumerable<OwnImage> images)
 		{
 			foreach (var image in images)
 				this.ConvertImage(image);
 		}
 		
-		private void ConvertImage(Convertidor.Models.Image image)
+		public async Task<bool> ConvertImagesAsync(IEnumerable<OwnImage> images, IProgress<OwnImage> progress, CancellationToken ct)
+		{
+			var tasks = new List<Task<OwnImage>>();
+			
+			images.ToList().ForEach(image => tasks.Add(this.ConvertImageAsync(image, ct)));
+			
+			foreach(var bucket in Interleaved(tasks))
+			{
+				var t = await bucket;
+				try
+				{
+					var image = await t.ConfigureAwait(false);
+					
+					if (progress != null) {
+						progress.Report(image);
+					}
+					
+					ct.ThrowIfCancellationRequested();
+				}
+				catch(OperationCanceledException) { return false; }
+				catch(Exception exc) { throw exc; }
+			}
+			
+			return true;
+		}
+		
+		private Task<OwnImage> ConvertImageAsync(OwnImage image, CancellationToken ct)
+		{
+			return Task.Run(() => this.ConvertImage(image), ct);
+		}
+		
+		private OwnImage ConvertImage(OwnImage image)
 		{
 			var onlyResizeIfWider = true;
 			var newWidth = 800;
@@ -63,26 +99,53 @@ namespace Convertidor.Services
 			var destinationImageFile = new FileInfo(image.SaveAs);
 			Directory.CreateDirectory(destinationImageFile.DirectoryName);
 			
-			var fullsizeImage = System.Drawing.Image.FromFile(image.Path);
-			
-			fullsizeImage.RotateFlip(RotateFlipType.Rotate180FlipNone);
-			fullsizeImage.RotateFlip(RotateFlipType.Rotate180FlipNone);
-			
-			if (onlyResizeIfWider && fullsizeImage.Width <= newWidth)
-				newWidth = fullsizeImage.Width;
-			
-			int thumbHeight = fullsizeImage.Height * newWidth / fullsizeImage.Width;
-			if (thumbHeight > maxHeight)
+			using (var fullsizeImage = System.Drawing.Image.FromFile(image.Path)) 
 			{
-				newWidth = fullsizeImage.Width * maxHeight / fullsizeImage.Height;
-				thumbHeight = maxHeight;
+				
+				fullsizeImage.RotateFlip(RotateFlipType.Rotate180FlipNone);
+				fullsizeImage.RotateFlip(RotateFlipType.Rotate180FlipNone);
+				
+				if (onlyResizeIfWider && fullsizeImage.Width <= newWidth)
+					newWidth = fullsizeImage.Width;
+				
+				int thumbHeight = fullsizeImage.Height * newWidth / fullsizeImage.Width;
+				if (thumbHeight > maxHeight)
+				{
+					newWidth = fullsizeImage.Width * maxHeight / fullsizeImage.Height;
+					thumbHeight = maxHeight;
+				}
+				
+				fullsizeImage.GetThumbnailImage(newWidth, thumbHeight, (System.Drawing.Image.GetThumbnailImageAbort) null, IntPtr.Zero)
+					.Save(image.SaveAs, jpegCodecInfo, myEncoderParameters);
+			}
+		
+			return image;
+
+		}
+		
+		public static Task<Task<T>> [] Interleaved<T>(IEnumerable<Task<T>> tasks)
+		{
+			var inputTasks = tasks.ToList();
+			
+			var buckets = new TaskCompletionSource<Task<T>>[inputTasks.Count];
+			var results = new Task<Task<T>>[buckets.Length];
+			for (int i = 0; i < buckets.Length; i++)
+			{
+				buckets[i] = new TaskCompletionSource<Task<T>>();
+				results[i] = buckets[i].Task;
 			}
 			
-			fullsizeImage.GetThumbnailImage(newWidth, thumbHeight, (System.Drawing.Image.GetThumbnailImageAbort) null, IntPtr.Zero)
-						.Save(image.SaveAs, jpegCodecInfo, myEncoderParameters);
+			int nextTaskIndex = -1;
+			Action<Task<T>> continuation = completed =>
+			{
+				var bucket = buckets[Interlocked.Increment(ref nextTaskIndex)];
+				bucket.TrySetResult(completed);
+			};
 			
-			fullsizeImage.Dispose();
-
+			foreach (var inputTask in inputTasks)
+				inputTask.ContinueWith(continuation, CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+			
+			return results;
 		}
 	}
 }
