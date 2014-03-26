@@ -68,12 +68,18 @@ namespace Convertidor.ViewModels
                 this.NotifyPropertyChanged("ProcessedImagesProgress");
             }
         }
-        
+
         public int ProcessedImagesProgress
         {
-            get 
-            { 
-                var total = (float)this.ProcessedImages.Count * 100 / this.Images.Count;
+            get
+            {
+                float total = 0;
+                
+                if (this.Images.Count > 0)
+                {
+                    total = (float)this.ProcessedImages.Count * 100 / this.Images.Count;
+                }
+                
                 return (int)Math.Round(total, MidpointRounding.AwayFromZero);
             }
         }
