@@ -50,6 +50,7 @@ namespace Convertidor.ViewModels
             {
                 this.images = value;
                 this.NotifyPropertyChanged();
+                // Notify that IsProgressBarVisible so it's reevaluated
                 this.NotifyPropertyChanged("IsProgressBarVisible");
             }
         }
@@ -65,6 +66,7 @@ namespace Convertidor.ViewModels
             set 
             { 
                 this.processedImages = value;
+                // Notify that ProcessedImagesProgress so it's reevaluated
                 this.NotifyPropertyChanged("ProcessedImagesProgress");
             }
         }
