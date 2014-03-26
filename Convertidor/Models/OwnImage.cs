@@ -1,14 +1,41 @@
-﻿using System;
-
+﻿// -----------------------------------------------------------------------------
+//  <copyright file="OwnImage.cs" company="">
+//      Copyright (c) 
+//  </copyright>
+// -----------------------------------------------------------------------------
 namespace Convertidor.Models
 {
-	/// <summary>
-	/// Description of Image.
-	/// </summary>
-	public class OwnImage
-	{
-        #region Creation
+    using System;
+    
+    /// <summary>
+    /// Description of Image.
+    /// </summary>
+    public class OwnImage
+    {
+        protected OwnImage()
+        {
+        }
+        
+        #region Properties
 
+        /// <summary>
+        /// Gets or sets the filename of the image.
+        /// </summary>
+        public string FileName { get; set; }    
+         
+        /// <summary>
+        /// Gets or sets the full path of the image.
+        /// </summary>
+        public string Path { get; set; }
+
+        /// <summary>
+        /// Gets or sets the full path of where to save the converted image.
+        /// </summary>
+        public string SaveAs { get; set; }
+        
+        #endregion // Properties
+        
+        #region Creation
         public static OwnImage CreateNewOwnImage()
         {
             return new OwnImage();
@@ -24,30 +51,6 @@ namespace Convertidor.Models
             };
         }
 
-        protected OwnImage()
-        {
-        }
-
         #endregion // Creation
-	
-     	#region Properties
-
-     	/// <summary>
-        /// Gets/sets the filename of the image.
-        /// </summary>
-        public string FileName { get; set; }	
-     	
-        /// <summary>
-        /// Gets/sets the full path of the image.
-        /// </summary>
-        public string Path { get; set; }
-
-        /// <summary>
-        /// Gets/sets the full path of where to save the converted image.
-        /// </summary>
-        public string SaveAs { get; set; }
-        
-        #endregion // Properties
-
-	}
+    }
 }

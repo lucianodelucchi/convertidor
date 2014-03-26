@@ -1,15 +1,20 @@
-﻿using System;
-using System.Windows;
-using System.Data;
-using System.Xml;
-using System.Configuration;
-
+﻿// -----------------------------------------------------------------------------
+//  <copyright file="App.xaml.cs" company="">
+//      Copyright (c) 
+//  </copyright>
+// -----------------------------------------------------------------------------
 namespace Convertidor
 {
-	/// <summary>
-	/// Interaction logic for App.xaml
-	/// </summary>
-	public partial class App : Application
-	{
-	}
+    using System;
+    using System.Configuration;
+    using System.Data;
+    using System.Windows;
+    using System.Xml;
+    
+    /// <summary>
+    /// Interaction logic for App.xaml
+    /// </summary>
+    public partial class App : Application
+    {
+    }
 }

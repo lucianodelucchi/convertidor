@@ -16,16 +16,7 @@ namespace Convertidor.Infrastructure
     public abstract class ViewModel : ObservableObject, IDataErrorInfo
     {
         /// <summary>
-        /// Gets the validation error for a property whose name matches the specified <see cref="columnName"/>.
-        /// </summary>
-        /// <param name="columnName">The name of the property to validate.</param>
-        /// <returns>Returns a validation error if there is one, otherwise returns null.</returns>
-        public string this[string columnName]
-        {
-            get { return OnValidate(columnName); }
-        }
-
-        /// <summary>
+        /// Gets the vlidation error
         /// Not supported.
         /// </summary>
         [Obsolete]
@@ -34,6 +25,16 @@ namespace Convertidor.Infrastructure
             get { throw new NotSupportedException(); }
         }
 
+        /// <summary>
+        /// Gets the validation error for a property whose name matches the specified <see cref="columnName"/>.
+        /// </summary>
+        /// <param name="columnName">The name of the property to validate.</param>
+        /// <returns>Returns a validation error if there is one, otherwise returns null.</returns>
+        public string this[string columnName]
+        {
+            get { return this.OnValidate(columnName); }
+        }
+        
         /// <summary>
         /// Validates a property whose name matches the specified <see cref="propertyName"/>.
         /// </summary>

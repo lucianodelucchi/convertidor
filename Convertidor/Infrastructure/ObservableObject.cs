@@ -24,7 +24,7 @@ namespace Convertidor.Infrastructure
         /// <param name="propertyName">Optional. The name of the property whose value has changed.</param>
         protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            PropertyChangedEventHandler handler = PropertyChanged;
+            PropertyChangedEventHandler handler = this.PropertyChanged;
 
             if (handler != null)
             {
