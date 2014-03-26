@@ -25,8 +25,8 @@ namespace Convertidor.ViewModels
     /// </summary>
     public class ImageViewModel : ViewModel
     {
-        private ObservableCollection<OwnImage> images;
-        private ObservableCollection<OwnImage> processedImages;
+        private ObservableCollection<OwnImage> images = new ObservableCollection<OwnImage>();
+        private ObservableCollection<OwnImage> processedImages = new ObservableCollection<OwnImage>();
         private ImageConverterService converterService;
         private RelayCommand convertImagesCommand;
         private RelayCommand cancelConvertImagesCommand;
@@ -147,8 +147,6 @@ namespace Convertidor.ViewModels
         public void LoadImages(string[] draggedFolders)
         {
             var currentImages = this.Images;
-            
-            this.Images = null;
             
             foreach (var directory in draggedFolders)
             {
