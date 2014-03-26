@@ -91,7 +91,6 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="pencil.ico" />
-    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Infrastructure" />
