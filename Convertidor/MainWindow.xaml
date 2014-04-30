@@ -8,7 +8,7 @@
 	WindowStartupLocation="CenterScreen"
 	Height="425"
 	SizeToContent="Height"
-	ResizeMode="NoResize">
+	ResizeMode="CanResizeWithGrip">
 	<Window.Resources>
 		<BooleanToVisibilityConverter
 			x:Key="BooleanToVisibilityConverter" />
@@ -27,8 +27,9 @@
 			</LinearGradientBrush.GradientStops>
 		</LinearGradientBrush>
 	</Window.Background>
-	<StackPanel>
-		<Border
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top">
+            <Border
 			Name="Droparea"
 			BorderThickness="1,1,1,1"
 			BorderBrush="#FF000000"
@@ -37,24 +38,24 @@
 			Drop="Droparea_Drop"
 			Height="100"
 			Margin="10,10,10,10">
-			<Border.Background>
-				<LinearGradientBrush
+                <Border.Background>
+                    <LinearGradientBrush
 					StartPoint="0.5,0"
 					EndPoint="0.5,1">
-					<LinearGradientBrush.GradientStops>
-						<GradientStop
+                        <LinearGradientBrush.GradientStops>
+                            <GradientStop
 							Color="#FFA6CAF0"
 							Offset="0" />
-						<GradientStop
+                            <GradientStop
 							Color="#FFA6CAF0"
 							Offset="0.99731903485254692" />
-						<GradientStop
+                            <GradientStop
 							Color="#FFFFFFFF"
 							Offset="0.5093833780160858" />
-					</LinearGradientBrush.GradientStops>
-				</LinearGradientBrush>
-			</Border.Background>
-			<TextBlock
+                        </LinearGradientBrush.GradientStops>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <TextBlock
 				Text="Drag the folder with the photos over this area"
 				TextAlignment="Center"
 				TextWrapping="WrapWithOverflow"
@@ -62,55 +63,61 @@
 				FontSize="12"
 				FontWeight="Bold"
 				VerticalAlignment="Center" />
-		</Border>
-		<ListBox
+            </Border>
+            <ListBox
 			ItemsSource="{Binding Images}"
 			DisplayMemberPath="FileName"
 			BorderThickness="1,1,1,1"
 			Height="100"
 			Margin="10,10,10,10" />
-		<StackPanel
+            <StackPanel
 			Orientation="Horizontal"
 			HorizontalAlignment="Right"
 			Margin="0,0,10,0">
-			<TextBlock
+                <TextBlock
 				Text="Total Images:" />
-			<TextBlock
+                <TextBlock
 				Text="{Binding Images.Count}" />
-		</StackPanel>
-		<Grid
+            </StackPanel>
+            <Grid
 			Visibility="{Binding IsProgressBarVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
-			<ProgressBar
+                <ProgressBar
 				Height="40"
 				Margin="10,10,10,10"
 				Value="{Binding ProcessedImagesProgress, Mode=OneWay}" />
-			<TextBlock
+                <TextBlock
 				HorizontalAlignment="Center"
 				VerticalAlignment="Center"
 				Text="{Binding ProcessedImagesProgress, StringFormat={}{0:0}%}" />
-		</Grid>
-		<StackPanel
+            </Grid>
+            <StackPanel
 			Orientation="Horizontal"
 			HorizontalAlignment="Center">
-			<Button
+                <Button
 				Command="{Binding ConvertImagesCommand}"
 				Width="75"
 				Height="49"
 				Content="Compress"
 				Margin="10,10,10,10" />
-			<Button
+                <Button
 				Command="{Binding CancelConvertImagesCommand}"
 				Width="75"
 				Height="49"
 				Content="Cancel"
 				Margin="10,10,10,10" />
-		</StackPanel>
-		<TextBlock
-			Text="Luciano Delucchi"
-			FontSize="9"
-			Height="24"
-			VerticalAlignment="Center"
-			Margin="0,0,10,0"
-			HorizontalAlignment="Right" />
-	</StackPanel>
+            </StackPanel>
+        </StackPanel>
+        <StatusBar DockPanel.Dock="Bottom" VerticalAlignment="Bottom">
+            <StatusBarItem HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                <TextBlock Text="Status:"></TextBlock>
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                <TextBlock Text="{Binding Status}"></TextBlock>
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem HorizontalAlignment="Right" HorizontalContentAlignment="Right">
+                <TextBlock Text="Luciano Delucchi"/>
+            </StatusBarItem>
+        </StatusBar>
+    </DockPanel>
 </Window>

@@ -6,16 +6,13 @@
 namespace Convertidor.ViewModels
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.IO;
     using System.Linq;
     using System.Threading;
-    using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Input;
-    using System.Windows.Threading;
-    
+
     using Convertidor.Infrastructure;
     using Convertidor.Models;
     using Convertidor.Services;
@@ -25,18 +22,21 @@ namespace Convertidor.ViewModels
     /// </summary>
     public class ImageViewModel : ViewModel
     {
-        private ObservableCollection<OwnImage> images = new ObservableCollection<OwnImage>();
-        private ObservableCollection<OwnImage> processedImages = new ObservableCollection<OwnImage>();
+        private ObservableCollection<OwnImage> images;
+        private ObservableCollection<OwnImage> processedImages;
         private ImageConverterService converterService;
         private RelayCommand convertImagesCommand;
         private RelayCommand cancelConvertImagesCommand;
         private CancellationTokenSource cts;
-        
+        private string status;
+
         #region Constructor
         public ImageViewModel()
         {
             this.converterService = new ImageConverterService();
-            
+
+            this.status = "Idle";
+
             this.images = new ObservableCollection<OwnImage>();
             this.processedImages = new ObservableCollection<OwnImage>();
         }
@@ -86,6 +86,16 @@ namespace Convertidor.ViewModels
             }
         }
         
+        public string Status
+        {
+            get { return this.status; }
+            set
+            {
+                this.status = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
         /// <summary>
         /// Returns a command that converts the images.
         /// </summary>
@@ -167,6 +177,7 @@ namespace Convertidor.ViewModels
         {
             if (this.cts != null) 
             {
+                this.Status = "Cancelling process";
                 this.cts.Cancel();
             }
         }
@@ -184,24 +195,16 @@ namespace Convertidor.ViewModels
             this.cts = new CancellationTokenSource();
             this.cts.Token.Register(() => this.ConversionCancelled());
             
+            this.Status = "Converting images";
+            
             var result = await this.converterService.ConvertImagesAsync(this.Images, progressIndicator, this.cts.Token);
-
-            this.ConversionFinished(result);
+            
+            this.Clear();
         }
         
         private void ConversionCancelled()
         {
-            this.Clear();
-            MessageBox.Show("Process Cancelled.");
-        }
-        
-        private void ConversionFinished(bool successful)
-        {
-            if (successful) 
-            {
-                this.Clear();
-                MessageBox.Show("Finished");
-            }
+            this.Status = "Process cancelled";
         }
         
         /// <summary>
@@ -210,8 +213,8 @@ namespace Convertidor.ViewModels
         private void Clear()
         {
             this.Images = new ObservableCollection<OwnImage>(this.Images.Except(this.ProcessedImages));
-            this.ProcessedImages = null;
             this.ProcessedImages = new ObservableCollection<OwnImage>();
+            this.Status = "Idle";
         }
         
         private void ReportProgress(OwnImage value)
