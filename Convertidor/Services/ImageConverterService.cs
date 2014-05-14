@@ -10,7 +10,6 @@ namespace Convertidor.Services
     using System.Drawing;
     using System.Drawing.Imaging;
     using System.IO;
-    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     
@@ -51,39 +50,6 @@ namespace Convertidor.Services
         }
         
         /// <summary>
-        /// Copied from
-        /// http://blogs.msdn.com/b/pfxteam/archive/2012/08/02/processing-tasks-as-they-complete.aspx
-        /// </summary>
-        /// <param name="tasks"></param>
-        /// <returns></returns>
-        public static Task<Task<T>>[] Interleaved<T>(IEnumerable<Task<T>> tasks)
-        {
-            var inputTasks = tasks.ToList();
-            
-            var buckets = new TaskCompletionSource<Task<T>>[inputTasks.Count];
-            var results = new Task<Task<T>>[buckets.Length];
-            for (int i = 0; i < buckets.Length; i++)
-            {
-                buckets[i] = new TaskCompletionSource<Task<T>>();
-                results[i] = buckets[i].Task;
-            }
-            
-            int nextTaskIndex = -1;
-            Action<Task<T>> continuation = completed =>
-            {
-                var bucket = buckets[Interlocked.Increment(ref nextTaskIndex)];
-                bucket.TrySetResult(completed);
-            };
-            
-            foreach (var inputTask in inputTasks)
-            {
-                inputTask.ContinueWith(continuation, CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
-            }
-            
-            return results;
-        }
-        
-        /// <summary>
         /// </summary>
         /// <param name="images"></param>
         public void ConvertImages(List<OwnImage> images)
@@ -93,43 +59,17 @@ namespace Convertidor.Services
                 this.ConvertImage(image);
             }
         }
-
-        public IObservable<OwnImage> ConvertImages(IEnumerable<OwnImage> images)
-        {
-            var ct = new CancellationToken();
-            return images.ToObservable().SelectMany(image => Observable.FromAsync(() => this.ConvertImageAsync(image,ct)));
-        }
-
+        
         /// <summary>
+        /// 
         /// </summary>
         /// <param name="images"></param>
-        /// <param name="progress"></param>
-        /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<bool> ConvertImagesAsync(IEnumerable<OwnImage> images, IProgress<OwnImage> progress, CancellationToken ct)
+        public IObservable<OwnImage> ConvertImages(IEnumerable<OwnImage> images, CancellationToken ct)
         {
-            var tasks = new List<Task<OwnImage>>();
-            
-            images.ToList().ForEach(image => tasks.Add(this.ConvertImageAsync(image, ct)));
-            
-            foreach (var bucket in Interleaved(tasks))
-            {
-                var t = await bucket;
-                try
-                {
-                    var image = await t.ConfigureAwait(false);
-                    
-                    if (progress != null) progress.Report(image);
-                    
-                    ct.ThrowIfCancellationRequested();
-                }
-                catch (OperationCanceledException) { return false; }
-                catch (Exception exc) { throw exc; }
-            }
-            
-            return true;
+            return images.ToObservable().SelectMany(image => Observable.FromAsync(() => this.ConvertImageAsync(image, ct)));
         }
-       
+
         /// <summary>
         /// </summary>
         /// <param name="format"></param>

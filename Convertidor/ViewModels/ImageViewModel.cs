@@ -10,13 +10,14 @@ namespace Convertidor.ViewModels
     using System.IO;
     using System.Linq;
     using System.Threading;
-    using System.Windows;
     using System.Windows.Input;
 
     using Convertidor.Infrastructure;
     using Convertidor.Models;
     using Convertidor.Services;
-    
+    using System.Reactive.Linq;
+    using System.Reactive.Concurrency;
+
     /// <summary>
     /// Description of ImageViewModel.
     /// </summary>
@@ -184,19 +185,22 @@ namespace Convertidor.ViewModels
         
         private void ConvertImages()
         {
-            
             this.cts = new CancellationTokenSource();
             this.cts.Token.Register(() => this.ConversionCancelled());
             
             this.Status = "Converting images";
-            
-            this.converterService.ConvertImages(this.Images).Subscribe(
+
+            this.converterService.ConvertImages(this.Images, this.cts.Token)
+                                                            .ObserveOn(DispatcherScheduler.Current)
+                                                            .SubscribeOn(ThreadPoolScheduler.Instance)
+                                                            .Finally(() => this.Clear())
+                                                            .Subscribe(
                                                                 // onNext
                                                                 image => this.ReportProgress(image),
                                                                 // onError
                                                                 exception => Console.WriteLine(exception.Message),
                                                                 // onCompleted
-                                                                () => this.Clear(),
+                                                                () => this.ConversionCompleted(),
                                                                 // cancellationToken
                                                                 this.cts.Token);
 
@@ -206,7 +210,12 @@ namespace Convertidor.ViewModels
         {
             this.Status = "Process cancelled";
         }
-        
+
+        private void ConversionCompleted()
+        {
+            this.Status = "Process finished";
+        }
+
         /// <summary>
         /// UI clean up
         /// </summary>
