@@ -106,7 +106,7 @@ namespace Convertidor.ViewModels
                 if (this.convertImagesCommand == null) 
                 {
                     this.convertImagesCommand = new RelayCommand(
-                                                        param => this.ConvertImagesAsync(),
+                                                        param => this.ConvertImages(),
                                                         param => this.CanConvertImages);
                 }
                 
@@ -184,22 +184,22 @@ namespace Convertidor.ViewModels
         
         private void ConvertImages()
         {
-            this.converterService.ConvertImages(this.Images);
-        }
-        
-        private async void ConvertImagesAsync()
-        {
-            // construct Progress<T>, passing ReportProgress as the Action<T>
-            var progressIndicator = new Progress<OwnImage>(this.ReportProgress);
             
             this.cts = new CancellationTokenSource();
             this.cts.Token.Register(() => this.ConversionCancelled());
             
             this.Status = "Converting images";
             
-            var result = await this.converterService.ConvertImagesAsync(this.Images, progressIndicator, this.cts.Token);
-            
-            this.Clear();
+            this.converterService.ConvertImages(this.Images).Subscribe(
+                                                                // onNext
+                                                                image => this.ReportProgress(image),
+                                                                // onError
+                                                                exception => Console.WriteLine(exception.Message),
+                                                                // onCompleted
+                                                                () => this.Clear(),
+                                                                // cancellationToken
+                                                                this.cts.Token);
+
         }
         
         private void ConversionCancelled()

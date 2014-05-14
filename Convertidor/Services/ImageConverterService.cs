@@ -15,7 +15,8 @@ namespace Convertidor.Services
     using System.Threading.Tasks;
     
     using Convertidor.Models;
-    
+    using System.Reactive.Linq;
+
     /// <summary>
     /// Description of ImageConverterService.
     /// </summary>
@@ -85,14 +86,20 @@ namespace Convertidor.Services
         /// <summary>
         /// </summary>
         /// <param name="images"></param>
-        public void ConvertImages(IEnumerable<OwnImage> images)
+        public void ConvertImages(List<OwnImage> images)
         {
             foreach (var image in images)
             {
                 this.ConvertImage(image);
             }
         }
-        
+
+        public IObservable<OwnImage> ConvertImages(IEnumerable<OwnImage> images)
+        {
+            var ct = new CancellationToken();
+            return images.ToObservable().SelectMany(image => Observable.FromAsync(() => this.ConvertImageAsync(image,ct)));
+        }
+
         /// <summary>
         /// </summary>
         /// <param name="images"></param>
